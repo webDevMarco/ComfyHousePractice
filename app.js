@@ -12,6 +12,7 @@ const productsDOM = document.querySelector('.products-center');
 
 
 let cart =[];
+let buttonsDOM = [];
 
 // GETTING PRODUCTS
 class Products{
@@ -58,12 +59,51 @@ products.forEach(product => {
 });
 productsDOM.innerHTML = result;
 }
+
+getBagButtons(){
+    const buttons = [...document.querySelectorAll('.bag-btn')]; // Turns it into array (spread operator)
+    buttonsDOM = buttons; // That way outside buttonsDOM is updated with this method.
+    buttons.forEach(button =>{
+        let id = button.dataset.id; // array property "1", "2"
+        let inCart = cart.find(item => item.id === id); // If item ID in cart is same as button id
+        if(inCart){
+            button.innerText = 'In Cart';
+            button.disabled = true;
+        }
+        else{
+            button.addEventListener('click', (event)=>{
+                event.target.disabled = true;
+                // Get product from Products (class)
+                let cartItem = Storage.getProduct(id)
+                console.log(cartItem)
+
+                // Add product to cart
+
+                // Save cart in local storage
+
+                // Set cart values
+                
+                // Display cart item
+
+                // Show the cart
+                
+            })        
+        }
+    })
+    }
 }
 
 // Local Storage
 
 class Storage{
+    static saveProducts(products){  // parameter
+        localStorage.setItem("products", JSON.stringify(products)); // JS object into JSON string
+    } 
 
+    static getProduct(id){
+        let products = JSON.parse(localStorage.getItem('products')); // JSON string => JS obnject
+        return products.find(product => product.id === id);
+    }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
@@ -72,5 +112,11 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     //Get All Products
 
-    products.getProducts().then(products => ui.displayProducts(products)) // display each product
-})
+    products.getProducts().then(products =>{
+        ui.displayProducts(products); // display each product
+        Storage.saveProducts(products);
+    }).then(() =>{
+        ui.getBagButtons();
+    })
+
+});
